@@ -1,19 +1,22 @@
-# Enforce component methods order (sort-comp)
+# Enforce component methods order (react/sort-comp)
 
-When creating React components it is more convenient to always follow the same organisation for methods order to helps you to easily find lifecyle methods, event handlers, etc.
+When creating React components it is more convenient to always follow the same organisation for method order to help you easily find lifecycle methods, event handlers, etc.
+
+**Fixable:** This rule is automatically fixable using the [`sort-comp` transform](https://github.com/reactjs/react-codemod/blob/master/transforms/sort-comp.js) in [react-codemod](https://www.npmjs.com/package/react-codemod).
 
 ## Rule Details
 
-With default configuration the following organisation must be followed:
+The default configuration ensures that the following order must be followed:
 
-  1. lifecycle methods: `displayName`, `propTypes`, `contextTypes`, `childContextTypes`, `mixins`, `statics`,`defaultProps`, `constructor`, `getDefaultProps`, `getInitialState`, `state`, `getChildContext`, `componentWillMount`, `componentDidMount`, `componentWillReceiveProps`, `shouldComponentUpdate`, `componentWillUpdate`, `componentDidUpdate`, `componentWillUnmount` (in this order).
-  2. custom methods
-  3. `render` method
+  1. static methods and properties
+  2. lifecycle methods: `displayName`, `propTypes`, `contextTypes`, `childContextTypes`, `mixins`, `statics`, `defaultProps`, `constructor`, `getDefaultProps`, `state`, `getInitialState`, `getChildContext`, `getDerivedStateFromProps`, `componentWillMount`, `UNSAFE_componentWillMount`, `componentDidMount`, `componentWillReceiveProps`, `UNSAFE_componentWillReceiveProps`, `shouldComponentUpdate`, `componentWillUpdate`, `UNSAFE_componentWillUpdate`, `getSnapshotBeforeUpdate`, `componentDidUpdate`, `componentDidCatch`, `componentWillUnmount` (in this order).
+  3. custom methods
+  4. `render` method
 
 The following patterns are considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   render: function() {
     return <div>Hello</div>;
   },
@@ -21,10 +24,10 @@ var Hello = React.createClass({
 });
 ```
 
-The following patterns are not considered warnings:
+The following patterns are **not** considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   displayName : 'Hello',
   render: function() {
     return <div>Hello</div>;
@@ -36,7 +39,7 @@ var Hello = React.createClass({
 
 This rule can take one argument to customize the components organisation.
 
-```
+```js
 ...
 "react/sort-comp": [<enabled>, { order: <order>, groups: <groups> }]
 ...
@@ -51,6 +54,7 @@ The default configuration is:
 ```js
 {
   order: [
+    'static-methods',
     'lifecycle',
     'everything-else',
     'render'
@@ -66,24 +70,36 @@ The default configuration is:
       'defaultProps',
       'constructor',
       'getDefaultProps',
-      'getInitialState',
       'state',
+      'getInitialState',
       'getChildContext',
+      'getDerivedStateFromProps',
       'componentWillMount',
+      'UNSAFE_componentWillMount',
       'componentDidMount',
       'componentWillReceiveProps',
+      'UNSAFE_componentWillReceiveProps',
       'shouldComponentUpdate',
       'componentWillUpdate',
+      'UNSAFE_componentWillUpdate',
+      'getSnapshotBeforeUpdate',
       'componentDidUpdate',
+      'componentDidCatch',
       'componentWillUnmount'
     ]
   }
 }
 ```
 
-* `lifecycle` is refering to the `lifecycle` group defined in `groups`.
-* `everything-else` is a special group that match all the methods that do not match any of the other groups.
-* `render` is refering to the `render` method.
+* `static-methods` is a special keyword that refers to static class methods.
+* `lifecycle` refers to the `lifecycle` group defined in `groups`.
+* `everything-else` is a special group that matches all of the methods that do not match any of the other groups.
+* `render` refers to the `render` method.
+* `type-annotations`. This group is not specified by default, but can be used to enforce flow annotations' positioning.
+* `getters` This group is not specified by default, but can be used to enforce class getters' positioning.
+* `setters` This group is not specified by default, but can be used to enforce class setters' positioning.
+* `instance-variables` This group is not specified by default, but can be used to enforce all other instance variables' positioning.
+* `instance-methods` This group is not specified by default, but can be used to enforce all other instance methods' positioning.
 
 You can override this configuration to match your needs.
 
@@ -92,6 +108,7 @@ For example, if you want to place your event handlers (`onClick`, `onSubmit`, et
 ```js
 "react/sort-comp": [1, {
   order: [
+    'static-methods',
     'lifecycle',
     '/^on.+$/',
     'render',
@@ -102,8 +119,8 @@ For example, if you want to place your event handlers (`onClick`, `onSubmit`, et
 
 With the above configuration, the following patterns are considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   render: function() {
     return <div>Hello</div>;
   },
@@ -111,10 +128,10 @@ var Hello = React.createClass({
 });
 ```
 
-With the above configuration, the following patterns are not considered warnings:
+With the above configuration, the following patterns are **not** considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   onClick: function() {},
   render: function() {
     return <div>Hello</div>;
@@ -127,6 +144,7 @@ If you want to split your `render` method into smaller ones and keep them just b
 ```js
 "react/sort-comp": [1, {
   order: [
+    'static-methods',
     'lifecycle',
     'everything-else',
     'rendering',
@@ -142,8 +160,8 @@ If you want to split your `render` method into smaller ones and keep them just b
 
 With the above configuration, the following patterns are considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   renderButton: function() {},
   onClick: function() {},
   render: function() {
@@ -152,16 +170,57 @@ var Hello = React.createClass({
 });
 ```
 
-With the above configuration, the following patterns are not considered warnings:
+With the above configuration, the following patterns are **not** considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   onClick: function() {},
   renderButton: function() {},
   render: function() {
     return <div>Hello</div>;
   }
 });
+```
+
+If you want to flow annotations to be at the top:
+
+```js
+"react/sort-comp": [1, {
+  order: [
+    'type-annotations',
+    'static-methods',
+    'lifecycle',
+    'everything-else',
+    'render',
+  ],
+}]
+```
+
+With the above configuration, the following patterns are considered warnings:
+
+```jsx
+class Hello extends React.Component<any, Props, void> {
+  onClick() { this._someElem = true; }
+  props: Props;
+  _someElem: bool;
+  render() {
+    return <div>Hello</div>;
+  }
+}
+```
+
+With the above configuration, the following patterns are **not** considered warnings:
+
+```jsx
+type Props = {};
+class Hello extends React.Component<any, Props, void> {
+  props: Props;
+  _someElem: bool;
+  onClick() { this._someElem = true; }
+  render() {
+    return <div>Hello</div>;
+  }
+}
 ```
 
 ## When Not To Use It

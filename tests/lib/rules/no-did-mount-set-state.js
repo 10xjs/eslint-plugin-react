@@ -8,240 +8,218 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-var rule = require('../../../lib/rules/no-did-mount-set-state');
-var RuleTester = require('eslint').RuleTester;
+const rule = require('../../../lib/rules/no-did-mount-set-state');
+const RuleTester = require('eslint').RuleTester;
 
-require('babel-eslint');
+const parserOptions = {
+  ecmaVersion: 2018,
+  sourceType: 'module',
+  ecmaFeatures: {
+    jsx: true
+  }
+};
 
 // ------------------------------------------------------------------------------
 // Tests
 // ------------------------------------------------------------------------------
 
-var ruleTester = new RuleTester();
+const ruleTester = new RuleTester({parserOptions});
 ruleTester.run('no-did-mount-set-state', rule, {
 
   valid: [{
-    code: [
-      'var Hello = React.createClass({',
-      '  render: function() {',
-      '    return <div>Hello {this.props.name}</div>;',
-      '  }',
-      '});'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: `
+      var Hello = createReactClass({
+        render: function() {
+          return <div>Hello {this.props.name}</div>;
+        }
+      });
+    `
   }, {
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {}',
-      '});'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {}
+      });
+    `
   }, {
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {',
-      '    someNonMemberFunction(arg);',
-      '    this.someHandler = this.setState;',
-      '  }',
-      '});'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {
+          someNonMemberFunction(arg);
+          this.someHandler = this.setState;
+        }
+      });
+    `
   }, {
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {',
-      '    someClass.onSomeEvent(function(data) {',
-      '      this.setState({',
-      '        data: data',
-      '      });',
-      '    })',
-      '  }',
-      '});'
-    ].join('\n'),
-    options: ['allow-in-func'],
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {
+          someClass.onSomeEvent(function(data) {
+            this.setState({
+              data: data
+            });
+          })
+        }
+      });
+    `
   }, {
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {',
-      '    function handleEvent(data) {',
-      '      this.setState({',
-      '        data: data',
-      '      });',
-      '    }',
-      '    someClass.onSomeEvent(handleEvent)',
-      '  }',
-      '});'
-    ].join('\n'),
-    parser: 'babel-eslint',
-    options: ['allow-in-func'],
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {
+          function handleEvent(data) {
+            this.setState({
+              data: data
+            });
+          }
+          someClass.onSomeEvent(handleEvent)
+        }
+      });
+    `,
+    parser: 'babel-eslint'
   }],
 
   invalid: [{
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {',
-      '    this.setState({',
-      '      data: data',
-      '    });',
-      '  }',
-      '});'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {
+          this.setState({
+            data: data
+          });
+        }
+      });
+    `,
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'class Hello extends React.Component {',
-      '  componentDidMount() {',
-      '    this.setState({',
-      '      data: data',
-      '    });',
-      '  }',
-      '}'
-    ].join('\n'),
+    code: `
+      class Hello extends React.Component {
+        componentDidMount() {
+          this.setState({
+            data: data
+          });
+        }
+      }
+    `,
     parser: 'babel-eslint',
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {',
-      '    this.setState({',
-      '      data: data',
-      '    });',
-      '  }',
-      '});'
-    ].join('\n'),
-    options: ['allow-in-func'],
-    ecmaFeatures: {
-      jsx: true
-    },
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {
+          this.setState({
+            data: data
+          });
+        }
+      });
+    `,
+    options: ['disallow-in-func'],
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'class Hello extends React.Component {',
-      '  componentDidMount() {',
-      '    this.setState({',
-      '      data: data',
-      '    });',
-      '  }',
-      '}'
-    ].join('\n'),
+    code: `
+      class Hello extends React.Component {
+        componentDidMount() {
+          this.setState({
+            data: data
+          });
+        }
+      }
+    `,
     parser: 'babel-eslint',
-    options: ['allow-in-func'],
+    options: ['disallow-in-func'],
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {',
-      '    someClass.onSomeEvent(function(data) {',
-      '      this.setState({',
-      '        data: data',
-      '      });',
-      '    })',
-      '  }',
-      '});'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {
+          someClass.onSomeEvent(function(data) {
+            this.setState({
+              data: data
+            });
+          })
+        }
+      });
+    `,
+    options: ['disallow-in-func'],
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'class Hello extends React.Component {',
-      '  componentDidMount() {',
-      '    someClass.onSomeEvent(function(data) {',
-      '      this.setState({',
-      '        data: data',
-      '      });',
-      '    })',
-      '  }',
-      '}'
-    ].join('\n'),
+    code: `
+      class Hello extends React.Component {
+        componentDidMount() {
+          someClass.onSomeEvent(function(data) {
+            this.setState({
+              data: data
+            });
+          })
+        }
+      }
+    `,
     parser: 'babel-eslint',
+    options: ['disallow-in-func'],
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {',
-      '    if (true) {',
-      '      this.setState({',
-      '        data: data',
-      '      });',
-      '    }',
-      '  }',
-      '});'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {
+          if (true) {
+            this.setState({
+              data: data
+            });
+          }
+        }
+      });
+    `,
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'class Hello extends React.Component {',
-      '  componentDidMount() {',
-      '    if (true) {',
-      '      this.setState({',
-      '        data: data',
-      '      });',
-      '    }',
-      '  }',
-      '}'
-    ].join('\n'),
+    code: `
+      class Hello extends React.Component {
+        componentDidMount() {
+          if (true) {
+            this.setState({
+              data: data
+            });
+          }
+        }
+      }
+    `,
     parser: 'babel-eslint',
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'var Hello = React.createClass({',
-      '  componentDidMount: function() {',
-      '    someClass.onSomeEvent((data) => this.setState({data: data}));',
-      '  }',
-      '});'
-    ].join('\n'),
+    code: `
+      var Hello = createReactClass({
+        componentDidMount: function() {
+          someClass.onSomeEvent((data) => this.setState({data: data}));
+        }
+      });
+    `,
     parser: 'babel-eslint',
-    ecmaFeatures: {
-      jsx: true
-    },
+    options: ['disallow-in-func'],
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]
   }, {
-    code: [
-      'class Hello extends React.Component {',
-      '  componentDidMount() {',
-      '    someClass.onSomeEvent((data) => this.setState({data: data}));',
-      '  }',
-      '}'
-    ].join('\n'),
+    code: `
+      class Hello extends React.Component {
+        componentDidMount() {
+          someClass.onSomeEvent((data) => this.setState({data: data}));
+        }
+      }
+    `,
     parser: 'babel-eslint',
+    options: ['disallow-in-func'],
     errors: [{
       message: 'Do not use setState in componentDidMount'
     }]

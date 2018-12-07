@@ -8,30 +8,33 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-var rule = require('../../../lib/rules/no-multi-comp');
-var RuleTester = require('eslint').RuleTester;
+const rule = require('../../../lib/rules/no-multi-comp');
+const RuleTester = require('eslint').RuleTester;
 
-require('babel-eslint');
+const parserOptions = {
+  ecmaVersion: 2018,
+  sourceType: 'module',
+  ecmaFeatures: {
+    jsx: true
+  }
+};
 
 // ------------------------------------------------------------------------------
 // Tests
 // ------------------------------------------------------------------------------
 
-var ruleTester = new RuleTester();
+const ruleTester = new RuleTester({parserOptions});
 ruleTester.run('no-multi-comp', rule, {
 
   valid: [{
     code: [
       'var Hello = require(\'./components/Hello\');',
-      'var HelloJohn = React.createClass({',
+      'var HelloJohn = createReactClass({',
       '  render: function() {',
       '    return <Hello name="John" />;',
       '  }',
       '});'
-    ].join('\r'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    ].join('\r')
   }, {
     code: [
       'class Hello extends React.Component {',
@@ -39,14 +42,10 @@ ruleTester.run('no-multi-comp', rule, {
       '    return <div>Hello {this.props.name}</div>;',
       '  }',
       '}'
-    ].join('\r'),
-    ecmaFeatures: {
-      classes: true,
-      jsx: true
-    }
+    ].join('\r')
   }, {
     code: [
-      'var Heading = React.createClass({',
+      'var Heading = createReactClass({',
       '  render: function() {',
       '    return (',
       '      <div>',
@@ -57,25 +56,7 @@ ruleTester.run('no-multi-comp', rule, {
       '    );',
       '  }',
       '});'
-    ].join('\r'),
-    ecmaFeatures: {
-      classes: true,
-      jsx: true
-    }
-  }, {
-    code: [
-      'export default {',
-      '  renderHello() {',
-      '    let {name} = this.props;',
-      '    return <div>{name}</div>;',
-      '  },',
-      '  renderHello2() {',
-      '    let {name2} = this.props;',
-      '    return <div>{name2}</div>;',
-      '  }',
-      '};'
-    ].join('\n'),
-    parser: 'babel-eslint'
+    ].join('\r')
   }, {
     code: [
       'function Hello(props) {',
@@ -100,31 +81,39 @@ ruleTester.run('no-multi-comp', rule, {
       '  }',
       '}'
     ].join('\r'),
-    ecmaFeatures: {
-      classes: true,
-      jsx: true
-    },
     options: [{
       ignoreStateless: true
     }]
+  }, {
+    // multiple non-components
+    code: [
+      'import React, { createElement } from "react"',
+      'const helperFoo = () => {',
+      '  return true;',
+      '};',
+      'function helperBar() {',
+      '  return false;',
+      '};',
+      'function RealComponent() {',
+      '  return createElement("img");',
+      '};'
+    ].join('\n'),
+    parserOptions: Object.assign({sourceType: 'module'}, parserOptions)
   }],
 
   invalid: [{
     code: [
-      'var Hello = React.createClass({',
+      'var Hello = createReactClass({',
       '  render: function() {',
       '    return <div>Hello {this.props.name}</div>;',
       '  }',
       '});',
-      'var HelloJohn = React.createClass({',
+      'var HelloJohn = createReactClass({',
       '  render: function() {',
       '    return <Hello name="John" />;',
       '  }',
       '});'
     ].join('\r'),
-    ecmaFeatures: {
-      jsx: true
-    },
     errors: [{
       message: 'Declare only one React component per file',
       line: 6
@@ -147,10 +136,6 @@ ruleTester.run('no-multi-comp', rule, {
       '  }',
       '}'
     ].join('\r'),
-    ecmaFeatures: {
-      classes: true,
-      jsx: true
-    },
     errors: [{
       message: 'Declare only one React component per file',
       line: 6
@@ -183,13 +168,27 @@ ruleTester.run('no-multi-comp', rule, {
       '  }',
       '}'
     ].join('\r'),
-    ecmaFeatures: {
-      classes: true,
-      jsx: true
-    },
     errors: [{
       message: 'Declare only one React component per file',
       line: 4
+    }]
+  }, {
+    code: [
+      'export default {',
+      '  renderHello(props) {',
+      '    let {name} = props;',
+      '    return <div>{name}</div>;',
+      '  },',
+      '  renderHello2(props) {',
+      '    let {name} = props;',
+      '    return <div>{name}</div>;',
+      '  }',
+      '};'
+    ].join('\n'),
+    parser: 'babel-eslint',
+    errors: [{
+      message: 'Declare only one React component per file',
+      line: 6
     }]
   }]
 });

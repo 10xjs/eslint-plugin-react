@@ -9,49 +9,54 @@
 // Requirements
 // -----------------------------------------------------------------------------
 
-var rule = require('../../../lib/rules/jsx-no-duplicate-props');
-var RuleTester = require('eslint').RuleTester;
+const rule = require('../../../lib/rules/jsx-no-duplicate-props');
+const RuleTester = require('eslint').RuleTester;
+
+const parserOptions = {
+  ecmaVersion: 2018,
+  sourceType: 'module',
+  ecmaFeatures: {
+    jsx: true
+  }
+};
 
 // -----------------------------------------------------------------------------
 // Tests
 // -----------------------------------------------------------------------------
 
-var ruleTester = new RuleTester();
+const ruleTester = new RuleTester({parserOptions});
 
-var expectedError = {
+const expectedError = {
   message: 'No duplicate props allowed',
   type: 'JSXAttribute'
 };
 
-var ignoreCaseArgs = [{
+const ignoreCaseArgs = [{
   ignoreCase: true
 }];
 
-var features = {
-  jsx: true
-};
-
 ruleTester.run('jsx-no-duplicate-props', rule, {
   valid: [
-    {code: '<App />;', ecmaFeatures: features},
-    {code: '<App {...this.props} />;', ecmaFeatures: features},
-    {code: '<App a b c />;', ecmaFeatures: features},
-    {code: '<App a b c A />;', ecmaFeatures: features},
-    {code: '<App {...this.props} a b c />;', ecmaFeatures: features},
-    {code: '<App c {...this.props} a b />;', ecmaFeatures: features},
-    {code: '<App a="c" b="b" c="a" />;', ecmaFeatures: features},
-    {code: '<App {...this.props} a="c" b="b" c="a" />;', ecmaFeatures: features},
-    {code: '<App c="a" {...this.props} a="c" b="b" />;', ecmaFeatures: features},
-    {code: '<App A a />;', ecmaFeatures: features},
-    {code: '<App A b a />;', ecmaFeatures: features},
-    {code: '<App A="a" b="b" B="B" />;', ecmaFeatures: features}
+    {code: '<App />;'},
+    {code: '<App {...this.props} />;'},
+    {code: '<App a b c />;'},
+    {code: '<App a b c A />;'},
+    {code: '<App {...this.props} a b c />;'},
+    {code: '<App c {...this.props} a b />;'},
+    {code: '<App a="c" b="b" c="a" />;'},
+    {code: '<App {...this.props} a="c" b="b" c="a" />;'},
+    {code: '<App c="a" {...this.props} a="c" b="b" />;'},
+    {code: '<App A a />;'},
+    {code: '<App A b a />;'},
+    {code: '<App A="a" b="b" B="B" />;'},
+    {code: '<App a:b="c" />;', options: ignoreCaseArgs}
   ],
   invalid: [
-    {code: '<App a a />;', errors: [expectedError], ecmaFeatures: features},
-    {code: '<App A b c A />;', errors: [expectedError], ecmaFeatures: features},
-    {code: '<App a="a" b="b" a="a" />;', errors: [expectedError], ecmaFeatures: features},
-    {code: '<App A a />;', options: ignoreCaseArgs, errors: [expectedError], ecmaFeatures: features},
-    {code: '<App a b c A />;', options: ignoreCaseArgs, errors: [expectedError], ecmaFeatures: features},
-    {code: '<App A="a" b="b" B="B" />;', options: ignoreCaseArgs, errors: [expectedError], ecmaFeatures: features}
+    {code: '<App a a />;', errors: [expectedError]},
+    {code: '<App A b c A />;', errors: [expectedError]},
+    {code: '<App a="a" b="b" a="a" />;', errors: [expectedError]},
+    {code: '<App A a />;', options: ignoreCaseArgs, errors: [expectedError]},
+    {code: '<App a b c A />;', options: ignoreCaseArgs, errors: [expectedError]},
+    {code: '<App A="a" b="b" B="B" />;', options: ignoreCaseArgs, errors: [expectedError]}
   ]
 });

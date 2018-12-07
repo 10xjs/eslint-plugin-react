@@ -1,4 +1,4 @@
-# Prevent React to be incorrectly marked as unused (jsx-uses-react)
+# Prevent React to be incorrectly marked as unused (react/jsx-uses-react)
 
 JSX expands to a call to `React.createElement`, a file which includes `React`
 but only uses JSX should consider the `React` variable as used.
@@ -7,6 +7,7 @@ If you are using the @jsx pragma this rule will mark the designated variable and
 
 This rule has no effect if the `no-unused-vars` rule is not enabled.
 
+You can use the [shared settings](/README.md#configuration) to specify a custom pragma.
 
 ## Rule Details
 
@@ -18,48 +19,27 @@ var React = require('react');
 // nothing to do with React
 ```
 
-```js
+```jsx
 /** @jsx Foo */
 var React = require('react');
 
 var Hello = <div>Hello {this.props.name}</div>;
 ```
 
-The following patterns are not considered warnings:
+The following patterns are **not** considered warnings:
 
-```js
+```jsx
 var React = require('react');
 
 var Hello = <div>Hello {this.props.name}</div>;
 ```
 
-```js
+```jsx
 /** @jsx Foo */
 var Foo = require('foo');
 
 var Hello = <div>Hello {this.props.name}</div>;
 ```
-
-
-## Rule Options
-
-```js
-...
-"jsx-uses-react": [<enabled>, { "pragma": <string> }]
-...
-```
-
-### `pragma`
-
-As an alternative to specifying the above pragma in each source file, you can specify
-this configuration option:
-
-```js
-var Foo = require('Foo');
-
-var Hello = <div>Hello {this.props.name}</div>;
-```
-
 
 ## When Not To Use It
 

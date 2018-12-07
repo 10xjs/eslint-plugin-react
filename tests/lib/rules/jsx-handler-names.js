@@ -8,82 +8,82 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-var rule = require('../../../lib/rules/jsx-handler-names');
-var RuleTester = require('eslint').RuleTester;
+const rule = require('../../../lib/rules/jsx-handler-names');
+const RuleTester = require('eslint').RuleTester;
+
+const parserOptions = {
+  ecmaVersion: 2018,
+  sourceType: 'module',
+  ecmaFeatures: {
+    jsx: true
+  }
+};
 
 // ------------------------------------------------------------------------------
 // Tests
 // ------------------------------------------------------------------------------
 
-var ruleTester = new RuleTester();
+const ruleTester = new RuleTester({parserOptions});
 ruleTester.run('jsx-handler-names', rule, {
   valid: [{
-    code: [
-      '<TestComponent onChange={this.handleChange} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<TestComponent onChange={this.handleChange} />'
   }, {
-    code: [
-      '<TestComponent onChange={this.props.onChange} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<TestComponent onChange={this.props.onChange} />'
   }, {
-    code: [
-      '<TestComponent onChange={this.props.onFoo} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<TestComponent onChange={this.props.onFoo} />'
   }, {
-    code: [
-      '<TestComponent isSelected={this.props.isSelected} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<TestComponent isSelected={this.props.isSelected} />'
   }, {
-    code: [
-      '<TestComponent shouldDisplay={this.state.shouldDisplay} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<TestComponent shouldDisplay={this.state.shouldDisplay} />'
   }, {
-    code: [
-      '<TestComponent shouldDisplay={arr[0].prop} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<TestComponent shouldDisplay={arr[0].prop} />'
+  }, {
+    code: '<TestComponent onChange={props.onChange} />'
+  }, {
+    code: '<TestComponent ref={this.handleRef} />'
+  }, {
+    code: '<TestComponent ref={this.somethingRef} />'
+  }, {
+    code: '<TestComponent test={this.props.content} />',
+    options: [{
+      eventHandlerPrefix: 'on',
+      eventHandlerPropPrefix: 'on'
+    }]
+  }, {
+    code: '<TestComponent onChange={props::handleChange} />',
+    parser: 'babel-eslint'
+  }, {
+    code: '<TestComponent onChange={::props.onChange} />',
+    parser: 'babel-eslint'
+  }, {
+    code: '<TestComponent onChange={props.foo::handleChange} />',
+    parser: 'babel-eslint'
+  }, {
+    code: '<TestComponent only={this.only} />'
   }],
 
   invalid: [{
-    code: [
-      '<TestComponent onChange={this.doSomethingOnChange} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
-    errors: [{message: 'Handler function for onChange prop key must be named handleChange'}]
+    code: '<TestComponent onChange={this.doSomethingOnChange} />',
+    errors: [{message: 'Handler function for onChange prop key must begin with \'handle\''}]
   }, {
-    code: [
-      '<TestComponent handleChange={this.handleChange} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
-    errors: [{message: 'Prop key for handleChange must be named onChange'}]
+    code: '<TestComponent onChange={this.handlerChange} />',
+    errors: [{message: 'Handler function for onChange prop key must begin with \'handle\''}]
   }, {
-    code: [
-      '<TestComponent onChange={this.onChange} />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
-    errors: [{message: 'Handler function for onChange prop key must be named handleChange'}]
+    code: '<TestComponent only={this.handleChange} />',
+    errors: [{message: 'Prop key for handleChange must begin with \'on\''}]
+  }, {
+    code: '<TestComponent handleChange={this.handleChange} />',
+    errors: [{message: 'Prop key for handleChange must begin with \'on\''}]
+  }, {
+    code: '<TestComponent onChange={this.onChange} />',
+    errors: [{message: 'Handler function for onChange prop key must begin with \'handle\''}]
+  }, {
+    code: '<TestComponent onChange={props::onChange} />',
+    parser: 'babel-eslint',
+    errors: [{message: 'Handler function for onChange prop key must begin with \'handle\''}]
+  }, {
+    code: '<TestComponent onChange={props.foo::onChange} />',
+    parser: 'babel-eslint',
+    errors: [{message: 'Handler function for onChange prop key must begin with \'handle\''}]
   }]
 });

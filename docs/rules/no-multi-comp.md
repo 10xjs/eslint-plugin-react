@@ -1,4 +1,4 @@
-# Prevent multiple component definition per file (no-multi-comp)
+# Prevent multiple component definition per file (react/no-multi-comp)
 
 Declaring only one component per file improves readability and reusability of components.
 
@@ -6,26 +6,26 @@ Declaring only one component per file improves readability and reusability of co
 
 The following patterns are considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   render: function() {
     return <div>Hello {this.props.name}</div>;
   }
 });
 
-var HelloJohn = React.createClass({
+var HelloJohn = createReactClass({
   render: function() {
     return <Hello name="John" />;
   }
 });
 ```
 
-The following patterns are not considered warnings:
+The following patterns are **not** considered warnings:
 
-```js
+```jsx
 var Hello = require('./components/Hello');
 
-var HelloJohn = React.createClass({
+var HelloJohn = createReactClass({
   render: function() {
     return <Hello name="John" />;
   }
@@ -36,17 +36,17 @@ var HelloJohn = React.createClass({
 
 ```js
 ...
-"no-multi-comp": [<enabled>, { "ignoreStateless": <boolean> }]
+"react/no-multi-comp": [<enabled>, { "ignoreStateless": <boolean> }]
 ...
 ```
 
 ### `ignoreStateless`
 
-When `true` the rule will ignore stateless components and will allow you to have multiple stateless components, or one statefull component and some stateless components in the same file.
+When `true` the rule will ignore stateless components and will allow you to have multiple stateless components, or one stateful component and some stateless components in the same file.
 
-The following patterns are considered okay and do not cause warnings:
+The following patterns are considered okay and do **not** cause warnings:
 
-```js
+```jsx
 function Hello(props) {
   return <div>Hello {props.name}</div>;
 }
@@ -55,7 +55,7 @@ function HelloAgain(props) {
 }
 ```
 
-```js
+```jsx
 function Hello(props) {
   return <div>Hello {props.name}</div>;
 }
@@ -69,4 +69,4 @@ module.exports = HelloJohn;
 
 ## When Not To Use It
 
-If you prefer to declare multiple components per files you can disable this rule.
+If you prefer to declare multiple components per file you can disable this rule.

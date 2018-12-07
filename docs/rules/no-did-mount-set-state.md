@@ -1,15 +1,15 @@
-# Prevent usage of setState in componentDidMount (no-did-mount-set-state)
+# Prevent usage of setState in componentDidMount (react/no-did-mount-set-state)
 
 Updating the state after a component mount will trigger a second `render()` call and can lead to property/layout thrashing.
 
 ## Rule Details
 
-This rule is aimed to forbid the use of `this.setState` in `componentDidMount`.
+This rule is aimed to forbid the use of `this.setState` in `componentDidMount` outside of functions, such as callbacks.
 
 The following patterns are considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   componentDidMount: function() {
     this.setState({
       name: this.props.name.toUpperCase()
@@ -21,8 +21,10 @@ var Hello = React.createClass({
 });
 ```
 
-```js
-var Hello = React.createClass({
+The following patterns are **not** considered warnings:
+
+```jsx
+var Hello = createReactClass({
   componentDidMount: function() {
     this.onMount(function callback(newName) {
       this.setState({
@@ -36,10 +38,8 @@ var Hello = React.createClass({
 });
 ```
 
-The following patterns are not considered warnings:
-
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   componentDidMount: function() {
     this.props.onMount();
   },
@@ -53,18 +53,18 @@ var Hello = React.createClass({
 
 ```js
 ...
-"no-did-mount-set-state": [<enabled>, <mode>]
+"react/no-did-mount-set-state": [<enabled>, <mode>]
 ...
 ```
 
-### `allow-in-func` mode
+### `disallow-in-func` mode
 
-By default this rule forbids any call to `this.setState` in `componentDidMount`. But since `componentDidMount` is a common place to set some event listeners, you may end up with calls to `this.setState` in some callbacks. The `allow-in-func` mode allows you to use `this.setState` in `componentDidMount` as long as they are called within a function.
+By default this rule forbids any call to `this.setState` in `componentDidMount` outside of functions. The `disallow-in-func` mode makes this rule more strict by disallowing calls to `this.setState` even within functions.
 
 The following patterns are considered warnings:
 
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   componentDidMount: function() {
     this.setState({
       name: this.props.name.toUpperCase()
@@ -76,10 +76,8 @@ var Hello = React.createClass({
 });
 ```
 
-The following patterns are not considered warnings:
-
-```js
-var Hello = React.createClass({
+```jsx
+var Hello = createReactClass({
   componentDidMount: function() {
     this.onMount(function callback(newName) {
       this.setState({

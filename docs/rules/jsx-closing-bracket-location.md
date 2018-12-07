@@ -1,6 +1,8 @@
-# Validate closing bracket location in JSX (jsx-closing-bracket-location)
+# Validate closing bracket location in JSX (react/jsx-closing-bracket-location)
 
 Enforce the closing bracket location for JSX multiline elements.
+
+**Fixable:** This rule is automatically fixable using the `--fix` flag on the command line.
 
 ## Rule Details
 
@@ -19,7 +21,7 @@ The following patterns are considered warnings:
   />;
 ```
 
-The following patterns are not considered warnings:
+The following patterns are **not** considered warnings:
 
 ```jsx
 <Hello firstName="John" lastName="Smith" />;
@@ -37,14 +39,14 @@ There are two ways to configure this rule.
 The first form is a string shortcut corresponding to the `location` values specified below. If omitted, it defaults to `"tag-aligned"`.
 
 ```js
-"jsx-closing-bracket-location": <enabled> // -> [<enabled>, "tag-aligned"]
-"jsx-closing-bracket-location": [<enabled>, "<location>"]
+"react/jsx-closing-bracket-location": <enabled> // -> [<enabled>, "tag-aligned"]
+"react/jsx-closing-bracket-location": [<enabled>, "<location>"]
 ```
 
 The second form allows you to distinguish between non-empty and self-closing tags. Both properties are optional, and both default to `"tag-aligned"`. You can also disable the rule for one particular type of tag by setting the value to `false`.
 
 ```js
-"jsx-closing-bracket-location": [<enabled>, {
+"react/jsx-closing-bracket-location": [<enabled>, {
   "nonEmpty": "<location>" || false,
   "selfClosing": "<location>" || false
 }]
@@ -69,7 +71,7 @@ The following patterns are considered warnings:
 // 'jsx-closing-bracket-location': 1
 // 'jsx-closing-bracket-location': [1, 'tag-aligned']
 // 'jsx-closing-bracket-location': [1, 'line-aligned']
-<Hello 
+<Hello
   firstName="John"
   lastName="Smith"
   />;
@@ -112,20 +114,7 @@ var x = function() {
 };
 
 // 'jsx-closing-bracket-location': [1, 'after-props']
-<Hello 
-  firstName="John"
-  lastName="Smith"
-  />;
-
-<Say
-  firstName="John"
-  lastName="Smith"
->
-  Hello
-</Say>;
-
-// 'jsx-closing-bracket-location': [1, 'props-aligned']
-<Hello 
+<Hello
   firstName="John"
   lastName="Smith" />;
 
@@ -134,9 +123,22 @@ var x = function() {
   lastName="Smith">
   Hello
 </Say>;
+
+// 'jsx-closing-bracket-location': [1, 'props-aligned']
+<Hello
+  firstName="John"
+  lastName="Smith"
+  />;
+
+<Say
+  firstName="John"
+  lastName="Smith"
+  >
+  Hello
+</Say>;
 ```
 
-The following patterns are not considered warnings:
+The following patterns are **not** considered warnings:
 
 ```jsx
 // 'jsx-closing-bracket-location': 1
@@ -186,7 +188,7 @@ var x = function() {
 };
 
 // 'jsx-closing-bracket-location': [1, {selfClosing: 'after-props'}]
-<Hello 
+<Hello
   firstName="John"
   lastName="Smith" />;
 
@@ -198,7 +200,7 @@ var x = function() {
 </Say>;
 
 // 'jsx-closing-bracket-location': [1, {selfClosing: 'props-aligned', nonEmpty: 'after-props'}]
-<Hello 
+<Hello
   firstName="John"
   lastName="Smith"
   />;

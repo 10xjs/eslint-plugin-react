@@ -1,21 +1,76 @@
-# No `.bind()` or Arrow Functions in JSX Props
+# No `.bind()` or Arrow Functions in JSX Props (react/jsx-no-bind)
 
-A `bind` call or [arrow function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) in a JSX prop will create a brand new function on every single render. This is bad for performance, as it will result in the garbage collector being invoked way more than is necessary.
+A `bind` call or [arrow function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) in a JSX prop will create a brand new function on every single render. This is bad for performance, as it will result in the garbage collector being invoked way more than is necessary. It may also cause unnecessary re-renders if a brand new function is passed as a prop to a component that uses reference equality check on the prop to determine if it should update.
 
 ## Rule Details
 
 The following patterns are considered warnings:
 
-```js
-<div onClick={this._handleClick.bind(this)}></div>
+```jsx
+<Foo onClick={this._handleClick.bind(this)}></Foo>
 ```
-```js
-<div onClick={() => console.log('Hello!'))}></div>
+```jsx
+<Foo onClick={() => console.log('Hello!')}></Foo>
 ```
 
-The following patterns are not considered warnings:
+The following patterns are **not** considered warnings:
+```jsx
+<Foo onClick={this._handleClick}></Foo>
+```
+
+## Rule Options
+
 ```js
-<div onClick={this._handleClick}></div>
+"react/jsx-no-bind": [<enabled>, {
+  "ignoreDOMComponents": <boolean> || false,
+  "ignoreRefs": <boolean> || false,
+  "allowArrowFunctions": <boolean> || false,
+  "allowFunctions": <boolean> || false,
+  "allowBind": <boolean> || false
+}]
+```
+
+### `ignoreDOMComponents`
+
+When `true` the following are **not** considered warnings:
+
+```jsx
+<div onClick={this._handleClick.bind(this) />
+<span onClick={() => console.log("Hello!")} />
+<button onClick={function() { alert("1337") }} />
+```
+
+### `ignoreRefs`
+
+When `true` the following are **not** considered warnings:
+
+```jsx
+<Foo ref={c => this._div = c} />
+<Foo ref={this._refCallback.bind(this)} />
+```
+
+### `allowArrowFunctions`
+
+When `true` the following is **not** considered a warning:
+
+```jsx
+<Foo onClick={() => alert("1337")} />
+```
+
+### `allowFunctions`
+
+When `true` the following is not considered a warning:
+
+```jsx
+<Foo onClick={function () { alert("1337") }} />
+```
+
+### `allowBind`
+
+When `true` the following is **not** considered a warning:
+
+```jsx
+<Foo onClick={this._handleClick.bind(this)} />
 ```
 
 ## Protips
@@ -24,8 +79,8 @@ The following patterns are not considered warnings:
 
 A common use case of `bind` in render is when rendering a list, to have a separate callback per list item:
 
-```js
-var List = React.createClass({
+```jsx
+var List = createReactClass({
   render() {
     return (
       <ul>
@@ -42,8 +97,8 @@ var List = React.createClass({
 
 Rather than doing it this way, pull the repeated section into its own component:
 
-```js
-var List = React.createClass({
+```jsx
+var List = createReactClass({
   render() {
     return (
       <ul>
@@ -55,7 +110,7 @@ var List = React.createClass({
   }
 });
 
-var ListItem = React.createClass({
+var ListItem = createReactClass({
   render() {
     return (
       <li onClick={this._onClick}>
@@ -73,12 +128,12 @@ This will speed up rendering, as it avoids the need to create new functions (thr
 
 ### ES6 Classes
 
-Unfortunately [React ES6 classes](https://facebook.github.io/react/blog/2015/01/27/react-v0.13.0-beta-1.html#es6-classes) do not autobind their methods like components created with the older `React.createClass` syntax. There are several approaches to binding methods for ES6 classes. A basic approach is to just manually bind the methods in the constructor:
+Unfortunately [React ES6 classes](https://facebook.github.io/react/blog/2015/01/27/react-v0.13.0-beta-1.html#es6-classes) do not autobind their methods like components created with the older `createReactClass` syntax. There are several approaches to binding methods for ES6 classes. A basic approach is to just manually bind the methods in the constructor:
 
-```js
+```jsx
 class Foo extends React.Component {
-  constructor() {
-    super();
+  constructor(...args) {
+    super(...args);
     this._onClick = this._onClick.bind(this);
   }
   render() {

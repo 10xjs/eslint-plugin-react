@@ -1,21 +1,56 @@
-# Disallow undeclared variables in JSX (jsx-no-undef)
+# Disallow undeclared variables in JSX (react/jsx-no-undef)
 
-This rules can help you locate potential ReferenceErrors resulting from misspellings or missing components.
+This rule helps locate potential ReferenceErrors resulting from misspellings or missing components.
 
 ## Rule Details
 
 The following patterns are considered warnings:
 
-```js
+```jsx
 <Hello name="John" />;
 ```
 
-The following patterns are not considered warnings:
+```jsx
+// will ignore Text in the global scope and warn
+var Hello = React.createClass({
+  render: function() {
+    return <Text>Hello</Text>;
+  }
+});
+module.exports = Hello;
+```
 
-```js
+
+The following patterns are **not** considered warnings:
+
+```jsx
 var Hello = require('./Hello');
 
 <Hello name="John" />;
+```
+
+## Rule Options
+
+```js
+...
+"react/jsx-no-undef": [<enabled>, { "allowGlobals": <boolean> }]
+...
+```
+
+### `allowGlobals`
+
+When `true` the rule will consider the global scope when checking for defined Components.
+
+The following patterns are considered okay and do **not** cause warnings:
+
+```jsx
+var Text = require('./Text');
+var Hello = React.createClass({
+  render: function() {
+    return <Text>Hello</Text>;
+  }
+});
+module.exports = Hello;
 ```
 
 ## When Not To Use It

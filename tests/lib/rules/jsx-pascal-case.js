@@ -8,112 +8,63 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-var rule = require('../../../lib/rules/jsx-pascal-case');
-var RuleTester = require('eslint').RuleTester;
+const rule = require('../../../lib/rules/jsx-pascal-case');
+const RuleTester = require('eslint').RuleTester;
+
+const parserOptions = {
+  ecmaVersion: 2018,
+  sourceType: 'module',
+  ecmaFeatures: {
+    jsx: true
+  }
+};
 
 // ------------------------------------------------------------------------------
 // Tests
 // ------------------------------------------------------------------------------
 
-var ruleTester = new RuleTester();
+const ruleTester = new RuleTester({parserOptions});
 ruleTester.run('jsx-pascal-case', rule, {
   valid: [{
-    code: [
-      'var TestComponent;',
-      '<TestComponent />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<testComponent />'
   }, {
-    code: [
-      'var CSSTransitionGroup;',
-      '<CSSTransitionGroup />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<test_component />'
   }, {
-    code: [
-      'var BetterThanCSS;',
-      '<BetterThanCSS />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<TestComponent />'
   }, {
-    code: [
-      'var TestComponent;',
-      '<TestComponent>',
-      '  <div />',
-      '</TestComponent>'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<CSSTransitionGroup />'
   }, {
-    code: [
-      'var Test1Component;',
-      '<Test1Component />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<BetterThanCSS />'
   }, {
-    code: [
-      'var TestComponent1;',
-      '<TestComponent1 />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<TestComponent><div /></TestComponent>'
   }, {
-    code: [
-      'var T3stComp0nent;',
-      '<T3stComp0nent />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    }
+    code: '<Test1Component />'
+  }, {
+    code: '<TestComponent1 />'
+  }, {
+    code: '<T3stComp0nent />'
+  }, {
+    code: '<T />'
+  }, {
+    code: '<YMCA />',
+    options: [{allowAllCaps: true}]
+  }, {
+    code: '<Modal.Header />'
+  }, {
+    code: '<Modal:Header />'
+  }, {
+    code: '<IGNORED />',
+    options: [{ignore: ['IGNORED']}]
   }],
 
   invalid: [{
-    code: [
-      'var testComponent;',
-      '<testComponent />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
-    errors: [{message: 'Imported JSX component testComponent must be in PascalCase'}]
+    code: '<Test_component />',
+    errors: [{message: 'Imported JSX component Test_component must be in PascalCase'}]
   }, {
-    code: [
-      'var test_component;',
-      '<test_component />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
-    errors: [{message: 'Imported JSX component test_component must be in PascalCase'}]
+    code: '<TEST_COMPONENT />',
+    errors: [{message: 'Imported JSX component TEST_COMPONENT must be in PascalCase'}]
   }, {
-    code: [
-      'var YELLING;',
-      '<YELLING />'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
-    errors: [{message: 'Imported JSX component YELLING must be in PascalCase'}]
-  }, {
-    code: [
-      'var testComponent;',
-      '<testComponent>',
-      '  <div />',
-      '</testComponent>'
-    ].join('\n'),
-    ecmaFeatures: {
-      jsx: true
-    },
-    errors: [{message: 'Imported JSX component testComponent must be in PascalCase'}]
+    code: '<YMCA />',
+    errors: [{message: 'Imported JSX component YMCA must be in PascalCase'}]
   }]
 });
